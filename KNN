@@ -1,0 +1,31 @@
+import numpy as np
+import operator
+def createdataset():
+    group=np.array([[1.0,1.1],[1.0,1.0],[0.0,0.0],[0.0,0.1]]) #样本集中四个数据
+    labels=['A','A','B','B'] #类别
+    return group,labels
+
+
+group,labels=createdataset()
+
+def classify0(inX,dataset,labels,k):
+    dataset_size=dataset.shape[0]  #返回矩阵行数
+    diffMat=np.tile(inX,(dataset_size,1))   #np.tile(array,(m,n))函数将原数组行复制m次列复制n次，
+    sqdiffMat=(diffMat-group)**2
+    sqdistances=sqdiffMat.sum(axis=1) #np.sum(axis=0 or 1)0:将每一列的元素相加，1：将每一行的元素相加，输出为一列or一行
+    distances=sqdistances**0.5    #Euclid distance
+    sortedDistIndicies=distances.argsort() #np.argsort()函数排序，提取从小到大的顺序的索引
+    classCount={} #建立一个空子典
+    for i in range(k):  #根据k值对当前k个数值的类别进行统计，并输出频率高的label
+        voteIlabel=labels[sortedDistIndicies[i]]
+        classCount[voteIlabel]=classCount.get(voteIlabel,0)+1
+    sorteClassCount=sorted(classCount.items(),  #items()函数以列表返回可遍历的(键, 值) 元组数组。
+        key=operator.itemgetter(1),reverse=True)
+    return sorteClassCount[0][0]
+#sorted(iterable, cmp=None, key=None, reverse=False)
+#iterable -- 可迭代对象。
+#cmp -- 比较的函数，这个具有两个参数，参数的值都是从可迭代对象中取出，此函数必须遵守的规则为，大于则返回1，小于则返回-1，等于则返回0。
+#key -- 主要是用来进行比较的元素，只有一个参数，具体的函数的参数就是取自于可迭代对象中，指定可迭代对象中的一个元素来进行排序。
+#reverse -- 排序规则，reverse = True 降序 ， reverse = False 升序（默认）。
+#operator.itemgetter(1) 获取对象的第一个位置的值
+print(classify0([1,1],group,labels,3))#自由测试各种数组
